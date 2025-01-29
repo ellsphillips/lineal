@@ -1,10 +1,7 @@
 #import "@preview/touying:0.5.3": *
 #import "@preview/numbly:0.1.0": *
 
-#import "src/theme.typ": lineal-theme
-#import "src/title.typ": title-slide
-#import "src/colour.typ": colour
-
+#import "lib.typ": lineal-theme, title-slide, colour
 
 #let brand = (
   wordmark: [$bb("L")"ineal"$],

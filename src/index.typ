@@ -2,3 +2,4 @@
 #import "outline.typ": lineal-outline
 #import "progress.typ": lineal-progress-bar
 #import "title.typ": title-slide
+#import "theme.typ": lineal-theme
