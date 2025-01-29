@@ -23,6 +23,7 @@ Lineal is available through Typst Universe. Ensure you have installed Typst loca
 Get started by importing the package and populating your own `/content/<slug>.typ` files:
 
 ```typst
+#import "@preview/touying:0.5.3": lineal-theme
 #import "@preview/lineal:0.1.0": lineal-theme
 
 #show: lineal-theme.with(
