@@ -40,10 +40,9 @@
     
     // Determine if this is the last section
     let heading-selector = selector(heading.where(level: 1)).before(here())
-    let level = counter(heading-selector)
+    let current-section-number = query(heading-selector).len()
     let headings = query(heading-selector)
     if headings.len() == 0 { return 0 }
-    let current-section-number = level.get().first()
 
     let is-last-section = total-sections == current-section-number
 
@@ -73,6 +72,7 @@
 
     let slides-covered-in-current-section = (
       query(selector(heading.where(level: 2)).after(current-section-start).before(here(), inclusive: false)).len()
+      + 1 // This makes the first slide of the section as "covered", otherwise there are gaps
     )
 
     let slides-remaining-in-current-section = (
@@ -85,7 +85,6 @@
       (
         query(selector(heading.where(level: 2)).after(here()).after(selector(heading.where(level: 1)).after(here()))).len()
         + query(selector(heading.where(level: 1)).after(here())).len()
-        + 1
       )
     }
 
