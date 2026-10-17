@@ -1,4 +1,4 @@
-#import "../lib.typ": lineal-theme, title-slide, config-info, brand
+#import "../lib.typ": lineal-theme, title-slide, lineal-toc, config-info, brand, colour
 #set document(title: "Lineal component gallery", date: none)
 
 #show: lineal-theme.with(
@@ -17,5 +17,13 @@
 #set text(size: 16pt)
 
 #title-slide()
+
+#heading(depth: 2, numbering: none, outlined: false)[In this gallery]
+
+#lineal-toc(
+  title: none, depth: 1,
+  page-numbers: true, page-numbering: "1", fill: repeat[.],
+  size: 22pt, gap: 1em, accent: colour.primary,
+)
 
 #include "content/index.typ"
