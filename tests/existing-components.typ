@@ -2,6 +2,7 @@
 #import "../src/components/repository.typ": repository-shares
 #set page(width: 700pt, height: 500pt, margin: 35pt)
 #set text(size: 18pt)
+#set align(horizon)
 #assert.eq(repository-shares((Typst: 2, Rust: 1)).map(item => item.share), (2 / 3, 1 / 3))
 #assert.eq(repository-shares((Typst: 100, Empty: 0)).len(), 1)
 #quote[The unattributed form also works.]

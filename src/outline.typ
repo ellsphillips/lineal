@@ -118,7 +118,7 @@
       block(width: 100%)[
         #grid(
           align: top,
-          columns: (30%, 70%),
+          columns: (1fr, 2fr),
           column-gutter: 2em,
           {
             // Left column: all section headings

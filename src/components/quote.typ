@@ -6,7 +6,7 @@
   radius: .35em, size: 1em, gap: .6em,
 ) = block(width: 100%, fill: fill, inset: inset, radius: radius, breakable: false, {
   set text(size: size, fill: ink)
-  grid(columns: (auto, 1fr), column-gutter: .4em,
+  grid(columns: (auto, 1fr), column-gutter: .4em, align: top,
     text(size: 2em, fill: accent)[“],
     [#body
       #if author != none or source != none {
