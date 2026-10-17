@@ -20,7 +20,7 @@
     width: 100%, fill: fill, inset: inset, radius: radius, breakable: false,
     {
       set text(size: size, fill: ink)
-      set par(spacing: 0pt, leading: .4em)
+      set par(spacing: .55em, leading: .4em)
       stack(dir: ttb, spacing: .65em, text(weight: "semibold", fill: accent, label), body)
     },
   )

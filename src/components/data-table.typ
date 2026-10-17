@@ -37,7 +37,7 @@
   let header-fill = if header-fill == auto { accent } else { header-fill }
   let highlight-fill = if highlight-fill == auto { accent.lighten(90%) } else { highlight-fill }
   set text(size: size, fill: ink)
-  set par(spacing: 0pt, leading: .4em)
+  set par(spacing: .55em, leading: .4em)
   table(
     columns: if columns == auto { (1fr,) * headers.len() } else { columns },
     align: align, inset: inset,

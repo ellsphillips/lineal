@@ -21,7 +21,7 @@
   width: 100%, inset: inset, fill: fill, radius: radius, breakable: false,
   {
     set text(size: size, fill: ink)
-    set par(spacing: 0pt, leading: .4em)
+    set par(spacing: .55em, leading: .4em)
     set text-align(align)
     let items = if label == none { () } else { (text(weight: "semibold", label),) }
     items.push(text(size: value-size, weight: "bold", fill: accent,

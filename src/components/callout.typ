@@ -27,7 +27,7 @@
     stroke: (left: 2.5pt + accent), breakable: false,
     {
       set text(size: size, fill: ink)
-      set par(spacing: 0pt, leading: .4em)
+      set par(spacing: .55em, leading: .4em)
       let items = if title == none { () } else { (text(weight: "semibold", fill: accent, title),) }
       stack(dir: ttb, spacing: .35em, ..items, body)
     },

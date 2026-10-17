@@ -29,7 +29,10 @@
 
 #v(18pt)
 #comparison(
-  [#strong[One paragraph] followed by a short list:
+  [#strong[Multiple paragraphs]
+
+  A second paragraph needs readable separation before its list:
+
   - First item
   - Second item],
   [#rect(width: 100%, height: 45pt, fill: accent, stroke: none)

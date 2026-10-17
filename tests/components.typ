@@ -30,7 +30,7 @@
 = Processes and comparisons
 
 #steps((
-  (title: [Prepare], description: [Gather the source material.]),
+  (title: [Prepare], description: [Gather the source material and agree who needs to review it.]),
   (title: [Review], description: [Check the measurements and examples.]),
   (title: [Publish], description: [Share the finished presentation.]),
 ), direction: "horizontal")

@@ -34,16 +34,19 @@
   }
   block(width: 100%, inset: inset, {
     set text(size: size, fill: ink)
-    set par(spacing: 0pt, leading: .4em)
+    set par(spacing: .55em, leading: .4em)
     if direction == "horizontal" {
-      grid(columns: (1fr,) * items.len(), column-gutter: gap,
+      grid(columns: (1fr,) * items.len(), column-gutter: gap, align: top,
         ..items.enumerate().map(((index, item)) => block(breakable: false, {
           stack(dir: ttb, spacing: .55em, marker(start + index), description(item))
         })),
       )
     } else {
       grid(columns: (auto, 1fr), column-gutter: .6em, row-gutter: gap, align: top,
-        ..items.enumerate().map(((index, item)) => (marker(start + index), description(item))).flatten(),
+        ..items.enumerate().map(((index, item)) => (
+          marker(start + index),
+          pad(top: (marker-size - .65em) / 2, description(item)),
+        )).flatten(),
       )
     }
   })
