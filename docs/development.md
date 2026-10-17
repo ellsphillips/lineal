@@ -8,7 +8,8 @@ against Typst 0.13.1 and 0.14.2.
 ```
 
 The checker compiles every `tests/*.typ` fixture whose name does not contain
-`errors`, verifies the invalid-input fixtures, and compiles the demo. Generated
+`errors`, verifies the invalid-input fixtures, compiles the README quick start
+in a fresh project, and compiles the demo. Generated
 PDFs and the staged package live in a temporary directory and are removed when
 the command finishes. Use `--typst /path/to/typst` to select another compiler, or
 `--skip-demo` while working on a component.

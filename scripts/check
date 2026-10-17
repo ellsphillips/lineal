@@ -15,8 +15,8 @@ sys.dont_write_bytecode = True
 from lineal_package import ROOT, manifest, stage_package
 
 
-def compile_fixture(compiler, source, output, package_root, inputs=None):
-    command = [compiler, "compile", "--root", str(ROOT), "--package-path", str(package_root)]
+def compile_fixture(compiler, source, output, package_root, inputs=None, root=ROOT):
+    command = [compiler, "compile", "--root", str(root), "--package-path", str(package_root)]
     for key, value in (inputs or {}).items():
         command.extend(("--input", f"{key}={value}"))
     command.extend((str(source), str(output)))
@@ -64,6 +64,17 @@ def negative_checks(compiler, temporary, package_root):
     return failures
 
 
+def quickstart_check(compiler, temporary, package_root):
+    examples = re.findall(r"```typst\n(.*?)```", (ROOT / "README.md").read_text(), re.DOTALL)
+    if not examples:
+        raise ValueError("README.md needs a complete Typst quick-start example")
+    project = stage_package(temporary / "quickstart")
+    source = project / "talk.typ"
+    source.write_text(examples[0])
+    result = compile_fixture(compiler, source, temporary / "quickstart.pdf", package_root, root=project)
+    return report_result("README quick start", result)
+
+
 def run_checks(compiler, include_demo):
     metadata = manifest()
     with tempfile.TemporaryDirectory(prefix="lineal-check-") as directory:
@@ -73,6 +84,7 @@ def run_checks(compiler, include_demo):
         print(f"Testing {metadata['name']} {metadata['version']} through an isolated @preview namespace", flush=True)
         failures = positive_checks(compiler, temporary, package_root)
         failures += negative_checks(compiler, temporary, package_root)
+        failures += quickstart_check(compiler, temporary, package_root)
         if include_demo:
             result = compile_fixture(compiler, ROOT / "demo/main.typ", temporary / "demo.pdf", package_root)
             failures += report_result("demo/main.typ", result)

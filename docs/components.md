@@ -170,5 +170,5 @@ keep their natural heights. Set `columns: (2fr, 3fr)` for asymmetric examples or
 
 Choose an appropriate `header-ink` for a custom table header, or `marker-ink` for
 light step markers. For further working examples, see
-[`tests/components.typ`](../tests/components.typ) and
-[`tests/components-custom.typ`](../tests/components-custom.typ).
+[`tests/components.typ`](https://github.com/ellsphillips/lineal/blob/main/tests/components.typ) and
+[`tests/components-custom.typ`](https://github.com/ellsphillips/lineal/blob/main/tests/components-custom.typ).

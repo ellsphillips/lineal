@@ -1,0 +1,12 @@
+#import "../lib.typ": layouts, code-block
+#set page(width: 700pt, height: 500pt, margin: 30pt)
+#set text(size: 18pt)
+#layouts.two-boxes([Left], [Right])
+#pagebreak()
+#layouts.contained([Main content], [Aside])
+#pagebreak()
+#layouts.four-columns([One], [Two], [Three], [Four])
+#pagebreak()
+#layouts.matrix(([One], [Two], [Three], [Four], [Five], [Six]))
+#pagebreak()
+#layouts.page-center(code-block(filename: "hello.py", language: "python", "print('Hello')"))
