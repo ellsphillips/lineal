@@ -42,6 +42,8 @@ first heading, `current`, `section`, `active` and each `relation` are `none`.
 `selected` accepts `auto` or an array of IDs. `depth` retains native outline
 semantics: it limits the original absolute heading level. `filter` accepts an
 annotated entry and returns a boolean. These options only change `visible`.
+Filter predicates can use `is-current` and `relation`. `is-active` is computed
+after selection for transforms and model output.
 
 Call `get-heading-model(target: heading.where(outlined: true), depth: none,
 filter: entry => true)` inside a Typst `context`. Targets must select headings.

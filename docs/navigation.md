@@ -115,6 +115,9 @@ Useful entry fields include:
 | `relation` | `same`, `parent`, `child`, `sibling` and `unrelated` booleans, or `none` before the first heading. |
 | `here-path`, `here-level` | Current structural path and raw level, or `none` before the first heading. |
 
+`is-active` is computed after filtering for transforms and model output. Filters
+can use `is-current` and `relation`.
+
 Keep transforms to display content rather than returning new `heading` elements.
 
 ## Page numbers and styling
