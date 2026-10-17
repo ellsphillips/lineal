@@ -98,20 +98,84 @@
   )
 }
 
+#let overlay-prefix-error = "heading-model: overlay headings must form a cumulative prefix; move conditional headings outside overlay functions or use ordinary styled text"
+
+#let flush-heading-overlay(state) = {
+  if not state.body-open { return state }
+  assert(state.body.len() >= state.baseline.len(),
+    message: overlay-prefix-error)
+  for (index, entry) in state.body.enumerate() {
+    if index < state.baseline.len() {
+      assert(entry.signature == state.baseline.at(index).signature,
+        message: overlay-prefix-error)
+    } else {
+      state.baseline.push(entry)
+      state.entries.push(entry)
+    }
+    state.aliases.push((id: entry.id, canonical: state.baseline.at(index).id))
+  }
+  state.body = ()
+  state.body-open = false
+  state
+}
+
+// Touying emits one logical-slide marker and a marker for each physical subslide.
+// Body heading ordinals identify replicas; content equality alone never does.
+#let collapse-heading-overlays(events) = {
+  let state = (entries: (), aliases: (), baseline: (), body: (), body-open: false)
+  for event in events {
+    if event.kind == "slide" {
+      state = flush-heading-overlay(state)
+      state.baseline = ()
+    } else if event.kind == "subslide" {
+      state = flush-heading-overlay(state)
+      state.body-open = true
+    } else if event.kind == "heading" {
+      if state.body-open {
+        state.body.push(event.entry)
+      } else {
+        state.entries.push(event.entry)
+        state.aliases.push((id: event.entry.id, canonical: event.entry.id))
+      }
+    }
+  }
+  state = flush-heading-overlay(state)
+  (entries: state.entries, aliases: state.aliases)
+}
+
+#let query-authored-headings() = {
+  let events = query(selector(heading).or(<touying-metadata>)).filter(entry => {
+    if entry.func() == heading { return true }
+    if entry.func() != metadata or type(entry.value) != dictionary { return false }
+    entry.value.at("kind", default: none) in ("touying-new-slide", "touying-new-subslide")
+  }).map(entry => {
+    if entry.func() != heading {
+      return (kind: if entry.value.kind == "touying-new-slide" { "slide" } else { "subslide" })
+    }
+    (kind: "heading", entry: (
+      id: entry.location(), loc: entry.location(), level: entry.level,
+      heading: entry, outlined: entry.outlined, signature: entry.fields(),
+    ))
+  })
+  collapse-heading-overlays(events)
+}
+
+#let canonical-heading-id(authored, id) = {
+  if id == none { return none }
+  let alias = authored.aliases.find(alias => alias.id == id)
+  if alias != none { alias.canonical }
+}
+
 // Call query adapters inside a context; pure model functions need no context.
 #let get-heading-model(target: heading.where(outlined: true), depth: none, filter: entry => true) = {
-  let actual = query(heading)
+  let authored = query-authored-headings()
   let selected = query(target)
   assert(selected.all(entry => entry.func() == heading),
     message: "heading-model: target must select headings only")
   let previous = query(selector(heading).before(here(), inclusive: false))
-  let current = if previous.len() > 0 { previous.last().location() }
-  let entries = actual.map(entry => (
-    id: entry.location(), loc: entry.location(), level: entry.level,
-    heading: entry, outlined: entry.outlined,
-  ))
-  build-heading-model(entries, current: current,
-    selected: selected.map(entry => entry.location()), depth: depth, filter: filter)
+  let current = if previous.len() > 0 { canonical-heading-id(authored, previous.last().location()) }
+  let selected = selected.map(entry => canonical-heading-id(authored, entry.location())).dedup()
+  build-heading-model(authored.entries, current: current, selected: selected, depth: depth, filter: filter)
 }
 
 #let current-heading(level: auto, outlined: true) = {

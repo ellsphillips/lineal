@@ -48,3 +48,19 @@ filter: entry => true)` inside a Typst `context`. Targets must select headings.
 The `current-heading(level: auto, outlined: true)` compatibility helper honors
 both arguments. `headings-context(target: ...)` returns the visible entries and
 the active heading with its index in that visible array.
+
+## Overlays
+
+Touying 0.5.3 emits logical-slide and physical-subslide metadata. Its authored
+section and slide headings appear once, while body headings can be replicated
+across overlay pages. The query adapter maps those replicas back to the first
+location at the same ordinal in a logical slide's heading sequence. Two authored
+headings with identical text retain distinct ordinals and IDs.
+
+Body heading sequences must stay identical or extend as a cumulative prefix
+across overlays. Removing, reordering or changing earlier headings raises an
+assertion. Use ordinary styled text for conditional overlay labels, or move
+headings outside overlay functions. Swapping indistinguishable conditional
+headings at the same ordinal is outside this contract: Typst's query API does
+not expose their original source identities. Ordinary documents have no overlay
+deduplication and preserve every authored heading location.
