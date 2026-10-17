@@ -1,0 +1,50 @@
+# Heading model
+
+`src/navigation/heading-model.typ` separates document structure from outline
+presentation. It has no Touying dependency. The outline UI uses its query
+adapter; structural tests call the pure model directly.
+
+```typst
+#import "../src/navigation/heading-model.typ": build-heading-model
+
+#let model = build-heading-model(
+  ((id: "section", level: 1), (id: "slide", level: 3)),
+  current: "slide",
+)
+#assert.eq(model.entries.last().path, (1, 1))
+```
+
+Every input entry needs a unique non-`none` `id` and a positive integer `level`.
+Additional fields are retained. The query adapter supplies `heading`, `loc` and
+`outlined` fields using actual Typst heading locations as stable IDs.
+
+The tree includes every authored heading, including `outlined: false` headings.
+A node belongs to its nearest preceding lower-level ancestor. Missing heading
+levels do not create synthetic parents. Printed numbering, repeated titles,
+target selectors and display filters do not change its ownership.
+
+Each entry carries:
+
+- `level`: the original Typst heading level.
+- `depth`, `path`: normalized structural depth and sibling ordinals.
+- `index`, `subtree-end`: an exclusive interval containing the node and descendants.
+- `parent-index`, `parent-id`, `root-index`, `root-id`: structural ownership.
+- `relation`: `same`, `parent` (any ancestor), `child` (any descendant), `sibling`
+  or `unrelated`, relative to the actual current heading. Exactly one is true.
+- `is-current`, `is-active`: actual position and nearest visible ancestor.
+- `here-path`, `here-level`, `here-depth`: current-heading context for transforms.
+
+The model returns `entries` for the whole tree, `visible` for the presentation
+projection, `current` for the actual current heading, `section` for its structural
+root and `active` for its closest visible ancestor, including itself. Before the
+first heading, `current`, `section`, `active` and each `relation` are `none`.
+
+`selected` accepts `auto` or an array of IDs. `depth` retains native outline
+semantics: it limits the original absolute heading level. `filter` accepts an
+annotated entry and returns a boolean. These options only change `visible`.
+
+Call `get-heading-model(target: heading.where(outlined: true), depth: none,
+filter: entry => true)` inside a Typst `context`. Targets must select headings.
+The `current-heading(level: auto, outlined: true)` compatibility helper honors
+both arguments. `headings-context(target: ...)` returns the visible entries and
+the active heading with its index in that visible array.
