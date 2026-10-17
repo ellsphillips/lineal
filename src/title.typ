@@ -35,7 +35,7 @@
               )
               line(
                 length: 100%,
-                stroke: 2pt + colour.primary,
+                stroke: 2pt + self.colors.primary,
               )
               if info.subtitle != none {
                 parbreak()

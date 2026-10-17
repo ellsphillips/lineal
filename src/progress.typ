@@ -4,7 +4,7 @@
 // Use slide counters so title slides and overlays do not skew progress.
 #let progress-ratios(current, total, start: 1, end: auto, variant: "exact") = {
   assert(variant in ("broad", "near", "exact"), message: "progress: unknown variant")
-  if total <= 0 { return (1, 0) }
+  if total <= 0 { return (broad: (1, 0), near: (0, 1, 0), exact: (0, 1, 0, 0)).at(variant) }
   let current = calc.clamp(current, 0, total)
   let before = calc.clamp(start - 1, 0, current)
   let end = if end == auto { total } else { calc.clamp(end, current, total) }

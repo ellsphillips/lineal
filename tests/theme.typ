@@ -2,6 +2,7 @@
 #set document(date: none)
 #show: lineal-theme.with(
   footer-progress: false,
+  logo: [Custom logo],
   config-info(title: [Import test], subtitle: [Public package API]),
   config-colors(primary: rgb("345d8b")),
 )

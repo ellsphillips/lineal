@@ -65,7 +65,7 @@
     show: components.cell.with(inset: (x: 2em, y: -1em))
     if self.store.footer-progress {
       box(width: 100%)[
-        #lineal-progress-bar(variant: "exact")
+        #lineal-progress-bar(variant: "exact", accent: self.colors.primary, remaining: self.colors.primary-light)
       ]
     }
     show: components.cell.with(inset: (y: 2em))
@@ -103,7 +103,8 @@
     show: setting
     block(inset: (bottom: 1em), body)
   }
-  touying-slide(self: self, config: config, repeat: repeat, setting: new-setting, composer: multicolumns, ..bodies)
+  let composer = if composer == auto { multicolumns } else { composer }
+  touying-slide(self: self, config: config, repeat: repeat, setting: new-setting, composer: composer, ..bodies)
 })
 
 
@@ -157,7 +158,7 @@
   aspect-ratio: "16-9",
   align: horizon,
   header: self => utils.display-current-heading(setting: utils.fit-to-width.with(grow: false, 100%), depth: self.slide-level),
-  logo: self => self.info.logo,
+  logo: auto,
   header-right: context utils.slide-counter.display() + " / " + utils.last-slide-number,
   footer-left: self => pad(self.info.logo, y: -.2em),
   footer-right: self => self.info.title,
@@ -165,6 +166,7 @@
   ..args,
   body,
 ) = {
+  let logo-config = if logo == auto { () } else { (config-info(logo: logo),) }
   show: touying-slides.with(
     config-page(
       paper: "presentation-" + aspect-ratio,
@@ -198,6 +200,7 @@
       datetime-format: "[day] [month repr:short] [year]"
     ),
     ..args,
+    ..logo-config,
   )
   body
 }

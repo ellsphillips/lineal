@@ -2,6 +2,42 @@
 
 #import "../src/brand.typ": colour, brand
 
+/// Compose arbitrary content in equally sized or explicitly weighted columns.
+#let columns(..bodies, widths: auto, gutter: 1em, align: top) = {
+  assert(bodies.named().len() == 0, message: "columns: unexpected named option")
+  let bodies = bodies.pos()
+  assert(bodies.len() > 0, message: "columns: provide at least one body")
+  let widths = if widths == auto { (1fr,) * bodies.len() } else { widths }
+  assert(type(widths) == array and widths.len() == bodies.len(),
+    message: "columns: widths must contain one track per body")
+  grid(columns: widths, gutter: gutter, align: align, ..bodies)
+}
+
+/// A surface for content, with an automatic height by default.
+#let panel(body, fill: colour.neutral-light, ink: colour.neutral-dark,
+  stroke: none, inset: 1em, radius: .35em, width: 100%, height: auto,
+  breakable: false,
+) = block(width: width, height: height, fill: fill, stroke: stroke,
+  inset: inset, radius: radius, breakable: breakable, text(fill: ink, body))
+
+/// A fixed frame that reports vertical overflow instead of clipping content.
+#let frame(body, width: 100%, height: 200pt, inset: 0pt,
+  fill: none, stroke: none, radius: 0pt,
+) = layout(size => context {
+  assert(type(width) in (length, ratio, relative),
+    message: "frame: width must be a length or relative width")
+  let width = if type(width) == length { width } else if type(width) == ratio {
+    width * size.width
+  } else { width.length + width.ratio * size.width }
+  assert(width > 0pt, message: "frame: width must be positive")
+  assert(type(height) == length and height > 0pt,
+    message: "frame: height must be a positive length")
+  let used = measure(block(width: width, inset: inset, breakable: false, body)).height
+  assert(used <= height, message: "frame: content exceeds the available height")
+  block(width: width, height: height, inset: inset, fill: fill,
+    stroke: stroke, radius: radius, breakable: false, body)
+})
+
 #let page-center(content) = {
   block(width: 100%)[
     #set align(horizon + center)
