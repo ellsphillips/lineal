@@ -10,19 +10,14 @@ Typst documents. Content stays editable and selectable in the exported PDF.
 
 ## Quick start
 
-Requires **Typst 0.13.1 or newer**. Clone the repository to try the current
-components immediately:
+Requires **Typst 0.13.1 or newer**. Version 0.2.0 is a release candidate until
+the registry submission is published. Use the source checkout or local package
+instructions below to try it now.
 
-```sh
-git clone https://github.com/ellsphillips/lineal.git
-cd lineal
-typst compile --root . demo/main.typ demo/main.pdf
-```
-
-Create `talk.typ` in that checkout:
+Create `talk.typ` with the public package API:
 
 ```typst
-#import "lib.typ": lineal-theme, config-info, title-slide, layouts, metric, callout
+#import "@preview/lineal:0.2.0": lineal-theme, config-info, title-slide, layouts, metric, callout
 
 #show: lineal-theme.with(
   aspect-ratio: "16-9",
@@ -47,13 +42,22 @@ section slides with an outline. Level-two headings create content slides.
 Deeper headings stay within a slide. Set `footer-progress: false` to hide the
 progress bar or customise the running headers and footers.
 
-## Package imports
+## Source checkout and local packages
 
 **Version 0.2.0 is a release candidate in this repository.** The published
 `0.1.0` package lacks the `lineal-theme` export. Updating a local checkout does
 not repair that older registry package.
 
-For a reusable local package, run:
+Clone the repository to compile the current gallery immediately:
+
+```sh
+git clone https://github.com/ellsphillips/lineal.git
+cd lineal
+typst compile --root . demo/main.typ demo/main.pdf
+```
+
+To use the quick-start example inside this checkout, change its import path to
+`"lib.typ"`. For a reusable local package, run:
 
 ```sh
 python3 scripts/package --install-local
@@ -67,12 +71,6 @@ Then use the same API from any project:
 #title-slide()
 == First slide
 Your content.
-```
-
-After the new version reaches Typst Universe, use the published namespace:
-
-```typst
-#import "@preview/lineal:0.2.0": lineal-theme, config-info, title-slide
 ```
 
 Local installation never replaces a published package or modifies the registry
