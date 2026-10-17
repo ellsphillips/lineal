@@ -1,7 +1,7 @@
 // expect-error: overlay headings must form a cumulative prefix
 #import "../../lib.typ": lineal-theme, config-common
 #import "../../src/navigation/heading-model.typ": get-heading-model
-#import "@preview/touying:0.5.3": only, pause
+#import "@preview/touying:0.7.4": only, pause
 
 #let inspect(self) = context {
   let model = get-heading-model()

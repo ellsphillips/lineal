@@ -1,6 +1,6 @@
 #import "../lib.typ": lineal-theme, config-info, config-common
 #import "../src/navigation/heading-model.typ": get-heading-model
-#import "@preview/touying:0.5.3": pause
+#import "@preview/touying:0.7.4": pause
 
 #let inspect(self) = context {
   let model = get-heading-model()
