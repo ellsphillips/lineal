@@ -5,7 +5,7 @@ an ordinary Typst document. Content remains selectable text; there are no image
 snapshots, extra package dependencies or required fonts.
 
 ```typst
-#import "@preview/lineal:0.1.0": callout, metric, steps, data-table, comparison
+#import "@preview/lineal:0.2.0": callout, metric, steps, data-table, comparison
 ```
 
 Use the local `lib.typ` import when trying an unpublished checkout. Each component
