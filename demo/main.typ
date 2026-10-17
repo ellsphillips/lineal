@@ -1,4 +1,5 @@
 #import "../lib.typ": lineal-theme, title-slide, config-info, brand
+#set document(title: "Lineal component gallery", date: none)
 
 #show: lineal-theme.with(
   aspect-ratio: "16-9",

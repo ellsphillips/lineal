@@ -6,6 +6,8 @@ Lineal provides a slide theme, composable layouts and components for talks,
 teaching material and project reviews. The components also work in ordinary
 Typst documents. Content stays editable and selectable in the exported PDF.
 
+![A team update composed with Lineal components](https://raw.githubusercontent.com/ellsphillips/lineal/main/assets/img/components.png)
+
 ## Quick start
 
 Requires **Typst 0.13.1 or newer**. Clone the repository to try the current
