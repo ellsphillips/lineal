@@ -25,7 +25,7 @@ def compile_fixture(compiler, source, output, package_root, inputs=None, root=RO
 
 def report_result(label, result, expected=None):
     if expected is None:
-        passed = result.returncode == 0
+        passed = result.returncode == 0 and not re.search(r"(?m)^warning:", result.stderr)
     else:
         passed = result.returncode != 0 and "assertion failed" in result.stderr and expected in result.stderr
     if passed:
