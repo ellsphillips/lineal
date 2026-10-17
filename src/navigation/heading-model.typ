@@ -88,10 +88,9 @@
   let ancestors = visible.filter(entry => entry.is-current or (entry.relation != none and entry.relation.parent))
   let active-id = if ancestors.len() > 0 { ancestors.last().id }
   let entries = annotated.map(entry => (..entry, is-active: entry.id == active-id))
-  let visible-ids = visible.map(entry => entry.id)
   (
     entries: entries,
-    visible: entries.filter(entry => entry.id in visible-ids),
+    visible: visible.map(entry => entries.at(entry.index)),
     current: if current-index != none { entries.at(current-index) },
     section: if current != none { entries.at(current.root-index) },
     active: if active-id != none { entries.find(entry => entry.id == active-id) },
