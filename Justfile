@@ -6,37 +6,24 @@ export TYPST_ROOT := root
 default:
 	@just --list --unsorted
 
-# Generate demo slides
+# Compile every fixture, verify rejected inputs and compile the demo
+check:
+    ./scripts/check
+
+# Alias for the full check suite
+test: check
+
+# Generate the demo slide deck
 demo:
-	typst compile demo/main.typ demo/main.pdf
+    typst compile --root . demo/main.typ demo/main.pdf
 
-# Run test suite
-test *args:
-    typst-test run {{ args }}
+# Stage distributable sources in a new or empty directory
+package destination:
+    ./scripts/package "{{destination}}"
 
-# Update test cases
-update *args:
-    typst-test update {{ args }}
+# Install the current version as @local/lineal, replacing that local version
+install:
+    ./scripts/package --install-local --replace
 
-# Package the library into the specified destination folder
-package target:
-    ./scripts/package "{{target}}"
-
-# Install the library with the "@local" prefix
-install: (package "@local")
-
-# Install the library with the "@preview" prefix (for pre-release testing)
-install-preview: (package "@preview")
-
-[private]
-remove target:
-  ./scripts/uninstall "{{target}}"
-
-# Uninstall the library from the "@local" prefix
-uninstall: (remove "@local")
-
-# Uninstall the library from the "@preview" prefix (for pre-release testing)
-uninstall-preview: (remove "@preview")
-
-# Run CI suite
-ci: test demo
+# Run the same checks as CI
+ci: check

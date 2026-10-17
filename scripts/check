@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Compile fixtures, reject invalid inputs, and smoke-test the release namespace."""
+
+import argparse
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+
+sys.dont_write_bytecode = True
+
+from lineal_package import ROOT, manifest, stage_package
+
+
+def compile_fixture(compiler, source, output, package_root, inputs=None):
+    command = [compiler, "compile", "--root", str(ROOT), "--package-path", str(package_root)]
+    for key, value in (inputs or {}).items():
+        command.extend(("--input", f"{key}={value}"))
+    command.extend((str(source), str(output)))
+    return subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+
+
+def report_result(label, result, expected=None):
+    if expected is None:
+        passed = result.returncode == 0
+    else:
+        passed = result.returncode != 0 and "assertion failed" in result.stderr and expected in result.stderr
+    if passed:
+        print(f"PASS {label}", flush=True)
+        return 0
+    print(f"FAIL {label}", file=sys.stderr)
+    if expected is not None:
+        print(f"Expected an assertion containing: {expected!r}", file=sys.stderr)
+    print(result.stdout + result.stderr, file=sys.stderr)
+    return 1
+
+
+def positive_checks(compiler, temporary, package_root):
+    failures = 0
+    for source in sorted((ROOT / "tests").glob("*.typ")):
+        if "errors" in source.stem:
+            continue
+        result = compile_fixture(compiler, source, temporary / f"{source.stem}.pdf", package_root)
+        failures += report_result(source.relative_to(ROOT), result)
+    return failures
+
+
+def negative_checks(compiler, temporary, package_root):
+    failures = 0
+    for source in sorted((ROOT / "tests/invalid").rglob("*.typ")):
+        marker = re.search(r"^// expect-error: (.+)$", source.read_text(), re.MULTILINE)
+        expected = marker.group(1) if marker else "assertion failed"
+        result = compile_fixture(compiler, source, temporary / "invalid.pdf", package_root)
+        failures += report_result(source.relative_to(ROOT), result, expected)
+    for specification in sorted((ROOT / "tests").glob("*-errors.json")):
+        for case in json.loads(specification.read_text()):
+            source = ROOT / "tests" / case["source"]
+            result = compile_fixture(compiler, source, temporary / "invalid.pdf", package_root, case["inputs"])
+            label = f"{source.relative_to(ROOT)} {case['inputs']}"
+            failures += report_result(label, result, case["error"])
+    return failures
+
+
+def run_checks(compiler, include_demo):
+    metadata = manifest()
+    with tempfile.TemporaryDirectory(prefix="lineal-check-") as directory:
+        temporary = Path(directory)
+        package_root = temporary / "packages"
+        stage_package(package_root / "preview" / metadata["name"] / metadata["version"])
+        print(f"Testing {metadata['name']} {metadata['version']} through an isolated @preview namespace", flush=True)
+        failures = positive_checks(compiler, temporary, package_root)
+        failures += negative_checks(compiler, temporary, package_root)
+        if include_demo:
+            result = compile_fixture(compiler, ROOT / "demo/main.typ", temporary / "demo.pdf", package_root)
+            failures += report_result("demo/main.typ", result)
+    return failures
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--typst", default="typst", help="compiler executable (default: typst)")
+    parser.add_argument("--skip-demo", action="store_true", help="run fixtures without compiling the demo")
+    args = parser.parse_args()
+    compiler = shutil.which(args.typst)
+    if compiler is None:
+        parser.exit(1, f"error: Typst executable not found: {args.typst}\n")
+    print(subprocess.check_output([compiler, "--version"], text=True).strip(), flush=True)
+    try:
+        failures = run_checks(compiler, not args.skip_demo)
+    except (OSError, ValueError, KeyError) as error:
+        parser.exit(1, f"error: {error}\n")
+    if failures:
+        print(f"{failures} check(s) failed", file=sys.stderr)
+        return 1
+    print("All Lineal checks passed")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

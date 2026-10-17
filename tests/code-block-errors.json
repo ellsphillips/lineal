@@ -1,0 +1,17 @@
+[
+  {"source": "code-block-errors.typ", "inputs": {"case": "height"}, "error": "needs"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "max-height"}, "error": "exceed max-height"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "range"}, "error": "outside the source range"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "nowrap"}, "error": "exceeds code width"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "token"}, "error": "unbreakable token"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "headerless-height"}, "error": "needs"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "headerless-max-height"}, "error": "exceed max-height"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "headerless-nowrap"}, "error": "exceeds code width"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "source"}, "error": "source must be a string"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "style"}, "error": "palette requires colour"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "style-name"}, "error": "style must be dark"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "start-line"}, "error": "start-line must be a positive integer"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "tab-size"}, "error": "tab-size must be a positive integer"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "width"}, "error": "width must be positive"},
+  {"source": "code-block-errors.typ", "inputs": {"case": "height-type"}, "error": "height must be a positive length"}
+]

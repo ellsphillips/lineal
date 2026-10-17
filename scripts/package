@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+"""Stage a release tree or install the current version in @local."""
+
+import argparse
+import sys
+
+sys.dont_write_bytecode = True
+
+from lineal_package import install_local, manifest, stage_package
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("destination", nargs="?", help="new or empty directory outside this repository")
+    parser.add_argument("--install-local", action="store_true", help="install in Typst's @local namespace")
+    parser.add_argument("--replace", action="store_true", help="replace this version of the @local package")
+    args = parser.parse_args()
+    if bool(args.destination) == args.install_local:
+        parser.error("choose a destination or --install-local")
+    if args.replace and not args.install_local:
+        parser.error("--replace is only available with --install-local")
+    try:
+        destination = install_local(args.replace) if args.install_local else stage_package(args.destination)
+    except (OSError, ValueError) as error:
+        parser.exit(1, f"error: {error}\n")
+    print(f"Staged Lineal {manifest()['version']} at {destination}")
+
+
+if __name__ == "__main__":
+    sys.exit(main())
