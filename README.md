@@ -93,12 +93,17 @@ require the slide theme, JavaScript or network requests while rendering.
 | `comparison(before, after, labels: ...)` | Two labelled content areas with configurable proportions. |
 | `quote(author: ..., source: ...)[body]` | Quotations with optional rich attribution. |
 | `repository(name: ..., languages: ...)` | A repository link and a language bar with normalised percentages. |
+| `lineal-outline()` and `lineal-toc()` | Contextual section navigation and a complete, flowing table of contents. |
+| `lineal-progress-bar(variant: ...)` | Logical slide progress with correct section, overlay and handout counts. |
 
 Detailed signatures and working examples:
 
 - [Code blocks and file labels](docs/code-block.md)
 - [Callouts, metrics, steps, tables and comparisons](docs/components.md)
 - [Layouts, quotes, repositories and theme configuration](docs/layouts.md)
+- [Outlines and tables of contents](docs/navigation.md)
+- [Progress calculations and counter semantics](docs/progress.md)
+- [Heading hierarchy and overlay identity](docs/navigation-model.md)
 - [Complete component gallery](https://github.com/ellsphillips/lineal/blob/main/demo/main.typ)
 
 ## Composition

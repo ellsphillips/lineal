@@ -16,6 +16,12 @@
 - Fix nested headings, progress bars without sections and theme logo overrides.
 - Add a component gallery, API guides, package smoke tests and compiler checks
   for Typst 0.13.1 and 0.14.2.
+- Replace outline path guessing with a tested heading forest, preserve hidden
+  structural ancestors, and add a flowing table of contents.
+- Compute section progress from pre-section counters, validate finite weights,
+  and upgrade to Touying 0.7.4 for correct handout counts. Preserve Lineal's
+  section-body handling explicitly across the dependency update.
+- Remove the unused debug statistics module so navigation has one data model.
 
 ### Compatibility
 

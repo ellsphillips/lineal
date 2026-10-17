@@ -51,7 +51,7 @@ the active heading with its index in that visible array.
 
 ## Overlays
 
-Touying 0.5.3 emits logical-slide and physical-subslide metadata. Its authored
+Touying 0.7.4 emits logical-slide and physical-subslide metadata. Its authored
 section and slide headings appear once, while body headings can be replicated
 across overlay pages. The query adapter maps those replicas back to the first
 location at the same ordinal in a logical slide's heading sequence. Two authored
