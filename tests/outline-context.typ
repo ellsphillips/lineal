@@ -1,5 +1,4 @@
-#import "../lib.typ": lineal-theme, config-info, config-colors
-#import "../src/outline.typ": lineal-outline, lineal-toc
+#import "../lib.typ": lineal-theme, config-info, config-colors, lineal-outline, lineal-toc
 
 #set document(date: none)
 #show: lineal-theme.with(config-info(title: [Navigation context]),

@@ -1,4 +1,4 @@
-#import "../src/outline.typ": lineal-outline
+#import "../lib.typ": lineal-outline
 #set document(date: none)
 #set page(width: 600pt, height: 360pt, margin: 32pt)
 #set text(size: 15pt)
