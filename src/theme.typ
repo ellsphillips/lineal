@@ -88,7 +88,7 @@
     show heading.where(level: self.slide-level + 1): it => {
       stack(
         dir: ltr, spacing: .4em,
-        image("uob-bullet.svg", height: .8em),
+        square(size: .35em, fill: self.colors.primary),
         text(fill: self.colors.primary, it.body)
       )
     }

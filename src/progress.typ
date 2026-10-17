@@ -1,149 +1,51 @@
-#import "@preview/touying:0.5.3": utils, components
-
+#import "@preview/touying:0.5.3": utils
 #import "brand.typ": colour
 
-
-
-#let get-current-section-number() = (
-  context {
-    let selector = selector(heading.where(level: 1)).before(here())
-    let level = counter(selector)
-    let headings = query(selector)
-
-    if headings.len() == 0 {
-      return
-    }
-
-    let heading = headings.last()
-
-    return level.get(heading.numbering)
-  }
-)
-
-
-
-#let calculate-progress-ratios(variant, callback) = (
-  context {
-    // --- `near` calculations
-    let PREVIOUS = (
-      query(selector(heading.where(level: 2)).before(here(), inclusive: false)).len()
-      + query(selector(heading.where(level: 1)).before(here())).len()
-    )
-
-    let CURRENT = (
-      query(selector(heading.where(level: 2)).after(here()).before(selector(heading.where(level: 1)).after(here()))).len()
-    )
-
-    // High level stats
-    let total-sections = query(selector(heading.where(level: 1))).len()
-    let current-heading = utils.current-heading(level: 1)
-    
-    // Determine if this is the last section
-    let heading-selector = selector(heading.where(level: 1)).before(here())
-    let current-section-number = query(heading-selector).len()
-    let headings = query(heading-selector)
-    if headings.len() == 0 { return 0 }
-
-    let is-last-section = total-sections == current-section-number
-
-    // Calculate remaining slides
-    let number-of-slides-in-current-section = (
-      query(selector(heading.where(level: 2)).after(here()).before(selector(heading.where(level: 1)).after(here()))).len()
-    )
-
-    let NEXT = if is-last-section { 
-        0 
-    } else {
-        utils.last-slide-counter.final().first() - (utils.slide-counter.get().first() + number-of-slides-in-current-section)
-    }
-
-    let TOTAL = utils.last-slide-counter.final().first()
-
-
-
-    // --- `exact` calculations
-    let current-section-start = utils.current-heading(level: 1).location()
-
-    let historic-section-slides = (
-      query(selector(heading.where(level: 2)).before(current-section-start, inclusive: false)).len()
-      + query(selector(heading.where(level: 1)).before(here(), inclusive: false)).len()
-      - 1
-    )
-
-    let slides-covered-in-current-section = (
-      query(selector(heading.where(level: 2)).after(current-section-start).before(here(), inclusive: false)).len()
-    )
-
-    let slides-remaining-in-current-section = (
-      query(selector(heading.where(level: 2)).after(here()).before(selector(heading.where(level: 1)).after(here()))).len()
-    )
-
-    let future-section-slides = if is-last-section { 
-      0
-    } else {
-      (
-        query(selector(heading.where(level: 2)).after(here()).after(selector(heading.where(level: 1)).after(here()))).len()
-        + query(selector(heading.where(level: 1)).after(here())).len()
-        + 1
-      )
-    }
-
-    let exact-total = (
-      historic-section-slides
-      + slides-covered-in-current-section
-      + slides-remaining-in-current-section
-      + future-section-slides
-    )
-    
-
-    let ratios = (
-      broad: (
-        calc.min(1.0, utils.slide-counter.get().first() / utils.last-slide-counter.final().first()),
-        calc.min(1.0, 1 - utils.slide-counter.get().first() / utils.last-slide-counter.final().first())
-      ),
-      near: (
-        PREVIOUS / TOTAL,
-        CURRENT / TOTAL,
-        NEXT / TOTAL,
-      ),
-      exact: (
-        historic-section-slides / exact-total,
-        slides-covered-in-current-section / exact-total,
-        slides-remaining-in-current-section / exact-total,
-        future-section-slides / exact-total,
-      )
-    )
-
-    callback(ratios.at(variant))
-  }
-)
-
-
-
-#let lineal-progress-bar(variant: str, height: 2pt, ratios: array) = calculate-progress-ratios(variant, ratios => {
-  let mapping = (
-    broad: grid(
-      columns: ratios.map(r => r * 100%),
-      rows: height,
-      components.cell(fill: colour.primary),
-      components.cell(fill: colour.primary-light),
-    ),
-    near: grid(
-      columns: ratios.map(r => r * 100%),
-      rows: height,
-      components.cell(fill: colour.primary),
-      components.cell(fill: colour.primary-light),
-      components.cell(fill: black.transparentize(60%)),
-    ),
-    exact: grid(
-      columns: ratios.map(r => r * 100%),
-      rows: height,
-      components.cell(fill: black.transparentize(60%)),
-      components.cell(fill: colour.primary),
-      components.cell(fill: colour.primary-light),
-      components.cell(fill: black.transparentize(80%)),
-    ),
+// Use slide counters so title slides and overlays do not skew progress.
+#let progress-ratios(current, total, start: 1, end: auto, variant: "exact") = {
+  assert(variant in ("broad", "near", "exact"), message: "progress: unknown variant")
+  if total <= 0 { return (1, 0) }
+  let current = calc.clamp(current, 0, total)
+  let before = calc.clamp(start - 1, 0, current)
+  let end = if end == auto { total } else { calc.clamp(end, current, total) }
+  let parts = (
+    broad: (current, total - current),
+    near: (before, end - before, total - end),
+    exact: (before, current - before, end - current, total - end),
   )
+  parts.at(variant).map(value => value / total)
+}
 
-  mapping.at(variant, default: mapping.broad)
-})
+#let lineal-progress-bar(
+  variant: "exact", height: 2pt, ratios: none,
+  accent: colour.primary, remaining: colour.primary-light,
+) = context {
+  assert(variant in ("broad", "near", "exact"), message: "progress: unknown variant")
+  let total = utils.last-slide-counter.final().first()
+  let current = utils.slide-counter.get().first()
+  let sections = query(heading.where(level: 1))
+  let previous = sections.filter(section => section.location().position().page <= here().position().page)
+  let future = sections.filter(section => section.location().position().page > here().position().page)
+  let start = if previous.len() > 0 {
+    utils.slide-counter.at(previous.last().location()).first()
+  } else { 1 }
+  let end = if future.len() > 0 {
+    utils.slide-counter.at(future.first().location()).first() - 1
+  } else { total }
+  let values = if ratios == none {
+    progress-ratios(current, total, start: start, end: end, variant: variant)
+  } else { ratios }
+  let fills = (
+    broad: (accent, remaining),
+    near: (black.transparentize(60%), accent, remaining),
+    exact: (black.transparentize(60%), accent, remaining, black.transparentize(80%)),
+  ).at(variant)
+  assert(type(values) == array and values.len() == fills.len(),
+    message: "progress: ratios must match the variant's segment count")
+  assert(values.all(value => type(value) in (int, float) and value >= 0) and values.sum() > 0,
+    message: "progress: ratios must be non-negative numbers with a positive total")
+  let segments = values.enumerate().filter(pair => pair.last() > 0)
+  grid(columns: segments.map(pair => pair.last() / values.sum() * 100%), rows: height,
+    ..segments.map(pair => rect(width: 100%, height: height, fill: fills.at(pair.first()), stroke: none)),
+  )
+}
