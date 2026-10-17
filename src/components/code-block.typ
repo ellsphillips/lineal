@@ -116,7 +116,7 @@
   ),
 )
 
-#let source-line(line, options, width) = {
+#let source-line(line, options, width) = context {
   let number = options.start-line + line.number - 1
   let chosen = selected-line(number, options.emphasize)
   let number-width = if options.line-numbers { options.number-width } else { 0pt }
