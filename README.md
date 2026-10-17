@@ -6,7 +6,7 @@ Lineal provides a slide theme, composable layouts and components for talks,
 teaching material and project reviews. The components also work in ordinary
 Typst documents. Content stays editable and selectable in the exported PDF.
 
-![A team update composed with Lineal components](https://raw.githubusercontent.com/ellsphillips/lineal/main/assets/img/components.png)
+![A team update composed with Lineal components](https://raw.githubusercontent.com/ellsphillips/lineal/941f266c40b5b24ba881fded1e6a52d6eafec8de/assets/img/components.png)
 
 ## Quick start
 
@@ -104,7 +104,7 @@ Detailed signatures and working examples:
 - [Outlines and tables of contents](docs/navigation.md)
 - [Progress calculations and counter semantics](docs/progress.md)
 - [Heading hierarchy and overlay identity](docs/navigation-model.md)
-- [Complete component gallery](https://github.com/ellsphillips/lineal/blob/main/demo/main.typ)
+- [Complete component gallery](https://github.com/ellsphillips/lineal/blob/941f266c40b5b24ba881fded1e6a52d6eafec8de/demo/main.typ)
 
 ## Composition
 
