@@ -20,6 +20,8 @@
 
 #let colour = (
   ..base-colours,
+  neutral-lightest: base-colours.neutral-light,
+  neutral-darkest: base-colours.neutral-dark,
   primary-light: base-colours.primary.lighten(50%),
   dev: rgb("#ec4899"),
   tech: tech-colours,

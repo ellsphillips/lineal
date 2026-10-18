@@ -1,39 +1,29 @@
 name: CI
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  tests:
-    runs-on: ubuntu-latest
+  checks:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        typst: ["0.13.1", "0.14.2"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - name: Probe runner package cache
-        uses: awalsh128/cache-apt-pkgs-action@latest
+      - name: Set up Typst
+        uses: typst-community/setup-typst@fee4b65b091cc546f02ce3be15fad8760f38a108 # v5.3.0
         with:
-          packages: cargo
-          version: 1.0
+          typst-version: ${{ matrix.typst }}
 
-      - name: Install tytanic from crates.io
-        uses: baptiste0928/cargo-install@v3.0.0
-        with:
-          crate: tytanic
-          version: "0.2.1"
-
-      - name: Run test suite
-        run: tt run
-
-      - name: Archive artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: artifacts
-          path: |
-            tests/**/diff/*.png
-            tests/**/out/*.png
-            tests/**/ref/*.png
-          retention-days: 5
+      - name: Check package, components and demo
+        run: ./scripts/check

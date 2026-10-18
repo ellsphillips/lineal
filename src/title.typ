@@ -1,4 +1,4 @@
-#import "@preview/touying:0.5.3": *
+#import "@preview/touying:0.7.4": *
 
 #import "brand.typ": colour
 
@@ -35,7 +35,7 @@
               )
               line(
                 length: 100%,
-                stroke: 2pt + colour.primary,
+                stroke: 2pt + self.colors.primary,
               )
               if info.subtitle != none {
                 parbreak()

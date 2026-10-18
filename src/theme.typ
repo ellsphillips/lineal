@@ -1,4 +1,4 @@
-#import "@preview/touying:0.5.3": *
+#import "@preview/touying:0.7.4": *
 
 #import "brand.typ": colour
 #import "outline.typ": lineal-outline
@@ -45,7 +45,7 @@
         weight: "bold",
         size: 1em,
         if title != auto {
-          utils.fit-to-width.with(grow: false, 100%, title)
+          utils.fit-to-width(grow: false, 100%, title)
         } else {
           utils.call-or-display(self, self.store.header)
         }
@@ -57,7 +57,7 @@
         utils.call-or-display(self, self.store.header-right)
       ),
     )
-    
+
   }
   let footer(self) = {
     set align(bottom)
@@ -65,7 +65,7 @@
     show: components.cell.with(inset: (x: 2em, y: -1em))
     if self.store.footer-progress {
       box(width: 100%)[
-        #lineal-progress-bar(variant: "exact")
+        #lineal-progress-bar(variant: "exact", accent: self.colors.primary, remaining: self.colors.primary-light)
       ]
     }
     show: components.cell.with(inset: (y: 2em))
@@ -88,7 +88,7 @@
     show heading.where(level: self.slide-level + 1): it => {
       stack(
         dir: ltr, spacing: .4em,
-        image("uob-bullet.svg", height: .8em),
+        square(size: .35em, fill: self.colors.primary),
         text(fill: self.colors.primary, it.body)
       )
     }
@@ -103,35 +103,44 @@
     show: setting
     block(inset: (bottom: 1em), body)
   }
-  touying-slide(self: self, config: config, repeat: repeat, setting: new-setting, composer: multicolumns, ..bodies)
+  let composer = if composer == auto { multicolumns } else { composer }
+  touying-slide(self: self, config: config, repeat: repeat, setting: new-setting, composer: composer, ..bodies)
 })
 
 
 
-#let new-section-slide(level: 1, numbered: true, body) = touying-slide-wrapper(self => {
+#let new-section-slide(level: 1, numbered: true, depth: auto, body) = touying-slide-wrapper(self => {
+  assert(type(level) == int and level > 0, message: "section slide: level must be a positive integer")
+  assert(type(numbered) == bool, message: "section slide: numbered must be a boolean")
+  let outline-body = lineal-outline(
+    title: none,
+    filter: hd => hd.relation != none and not hd.relation.unrelated,
+    depth: if depth == auto { level + 1 } else { depth },
+    ink: self.colors.primary, accent: self.colors.primary,
+    transform: (hd, it) => {
+      set text(size: 1.25em, fill: self.colors.primary, weight: "bold") if hd.relation != none and hd.relation.same
+      set text(fill: self.colors.primary) if hd.relation != none and hd.relation.child
+      set text(fill: text.fill.transparentize(60%)) if hd.relation != none and hd.relation.sibling
+
+      hd.heading.body
+    }
+  )
   let slide-body = {
     set align(horizon)
     show: pad.with(left: 5%, right: 10%)
-
-    lineal-outline(
-      title: none,
-      filter: hd => hd.relation != none and not hd.relation.unrelated,
-      depth: 2,
-      transform: (hd, it) => {
-        set text(size: 1.25em, fill: self.colors.primary, weight: "bold") if hd.relation != none and hd.relation.same
-        set text(fill: self.colors.primary) if hd.relation != none and hd.relation.child
-        set text(fill: text.fill.transparentize(60%)) if hd.relation != none and hd.relation.sibling
-
-        // Extract just the heading text without numbering
-        let heading-text = hd.heading.body
-        heading-text
-      }
-    )
-    
+    // Measure only the generated outline, without replaying Touying's counter
+    // preamble or hiding the author's pause/only markers inside a context.
+    layout(size => context {
+      let used = measure(block(width: size.width, outline-body)).height
+      assert(used <= size.height,
+        message: "section outline exceeds the available height; reduce its depth or use separate contents pages")
+      outline-body
+    })
     body
   }
   self = utils.merge-dicts(
     self,
+    config-common(freeze-slide-counter: not numbered),
     config-page(fill: self.colors.neutral-lightest),
   )
   touying-slide(self: self, slide-body)
@@ -157,14 +166,17 @@
   aspect-ratio: "16-9",
   align: horizon,
   header: self => utils.display-current-heading(setting: utils.fit-to-width.with(grow: false, 100%), depth: self.slide-level),
-  logo: self => self.info.logo,
+  logo: auto,
   header-right: context utils.slide-counter.display() + " / " + utils.last-slide-number,
   footer-left: self => pad(self.info.logo, y: -.2em),
   footer-right: self => self.info.title,
   footer-progress: true,
+  section-depth: 2,
+  section-numbered: true,
   ..args,
   body,
 ) = {
+  let logo-config = if logo == auto { () } else { (config-info(logo: logo),) }
   show: touying-slides.with(
     config-page(
       paper: "presentation-" + aspect-ratio,
@@ -174,7 +186,8 @@
     ),
     config-common(
       slide-fn: slide,
-      new-section-slide-fn: new-section-slide,
+      new-section-slide-fn: new-section-slide.with(depth: section-depth, numbered: section-numbered),
+      receive-body-for-new-section-slide-fn: true,
     ),
     config-methods(
       init: (self: none, body) => {
@@ -198,6 +211,7 @@
       datetime-format: "[day] [month repr:short] [year]"
     ),
     ..args,
+    ..logo-config,
   )
   body
 }
